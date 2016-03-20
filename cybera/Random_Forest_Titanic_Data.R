@@ -55,19 +55,6 @@ summary(titanic.test$Survived)
 titanic.rf.model <- randomForest(Survived ~ ., data=titanic.train, importance=TRUE, ntree=500)
 print(titanic.rf.model)
 
-#                Type of random forest: classification
-#                      Number of trees: 500
-# No. of variables tried at each split: 2
-#          OOB estimate of  error rate: 16.05%
-# Confusion matrix:
-#-----------------------------------------------
-#          | Perished | Survived | class.error |
-# ---------+----------+----------+-------------|
-# Perished |      349 |       28 |  0.07427056 |
-# Survived |       72 |      174 |  0.29268293 |
-#-----------------------------------------------
-
-
 ## MODEL EVALUATION
 ## Predict test set outcomes, reporting class labels
 titanic.rf.predictions <- predict(titanic.rf.model, titanic.test, type="response")
@@ -75,30 +62,32 @@ titanic.rf.predictions <- predict(titanic.rf.model, titanic.test, type="response
 titanic.rf.confusion <- table(titanic.rf.predictions, titanic.test$Survived)
 print(titanic.rf.confusion)
 
+print("-------------------------------")
 ## accuracy
 titanic.rf.accuracy <- sum(diag(titanic.rf.confusion)) / sum(titanic.rf.confusion)
-print(titanic.rf.accuracy)
+paste("Accuracy", titanic.rf.accuracy, sep = " : ")
 
 ## precision
 titanic.rf.precision <- titanic.rf.confusion[2,2] / sum(titanic.rf.confusion[2,])
-print(titanic.rf.precision)
+paste("Precision", titanic.rf.precision, sep = " : ")
 
 ## recall
 titanic.rf.recall <- titanic.rf.confusion[2,2] / sum(titanic.rf.confusion[,2])
-print(titanic.rf.recall)
+paste("   Recall", titanic.rf.recall, sep = " : ")
 
 ## F1 score
 titanic.rf.F1 <- 2 * titanic.rf.precision * titanic.rf.recall / (titanic.rf.precision + titanic.rf.recall)
-print(titanic.rf.F1)
+paste("       F1", titanic.rf.F1, sep = " : ")
+print("-------------------------------")
 
 # We can also report probabilities
-titanic.rf.predictions.prob <- predict(titanic.rf.model, titanic.test, type="prob")
-head(titanic.rf.predictions.prob)
-head(titanic.test)
+# titanic.rf.predictions.prob <- predict(titanic.rf.model, titanic.test, type="prob")
+# head(titanic.rf.predictions.prob)
+# head(titanic.test)
 
 ## show variable importance
 importance(titanic.rf.model)
-varImpPlot(titanic.rf.model)
+# varImpPlot(titanic.rf.model)
 
 ## EXERCISE
 ## Random forest has built-in feature selection.
