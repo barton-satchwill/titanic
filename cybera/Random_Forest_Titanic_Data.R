@@ -15,6 +15,7 @@ library(randomForest)
 ## load the Titanic data in R
 ## Be sure your working directory is set to bootcamp base directory
 #titanic.data <- read.csv("data/titanic.csv", header=TRUE)
+setwd("~/projects/r/titanic")
 titanic.data <- read.csv("data/train.csv", header=TRUE)
 ## explore the data set
 dim(titanic.data)
@@ -98,13 +99,6 @@ head(titanic.test)
 ## show variable importance
 importance(titanic.rf.model)
 varImpPlot(titanic.rf.model)
-
-
-
-
-accuracy 0.84
-precision 0.80
-
 
 ## EXERCISE
 ## Random forest has built-in feature selection.
