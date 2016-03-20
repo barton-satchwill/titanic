@@ -12,6 +12,41 @@
 # embarked ... Port of Embarkation (C = Cherbourg; Q = Queenstown; S = Southampton)
 #--------------------------------------------------------------------------------------
 
+evaluate.model <- function(predicted, actual) {
+	# calculate the confusion matrix
+	print("-------------------------------")
+	print(paste("a","b","c"))
+	confusion <- table(predicted, actual)
+	print(confusion)
+
+	print("-------------------------------")
+	# accuracy
+	accuracy <- sum(diag(confusion)) / sum(confusion)
+	print(paste("Acccuracy" ,format(accuracy, digits=2), sep = " : "))
+
+	# precision
+	precision <- confusion[2,2] / sum(confusion[2,])
+	print(paste("Precision" ,format(precision, digits=2), sep = " : "))
+
+	# recall
+	recall <- confusion[2,2] / sum(confusion[,2])
+	print(paste("   Recall" ,format(recall, digits=2), sep = " : "))
+
+	# F1 score
+	F1 <- 2 * precision * recall / (precision + recall)
+	print(paste("       F1" ,format(F1, digits=2), sep = " : "))
+	print("-------------------------------")
+
+	## We can also report probabilities
+	# prediction.prob <- predict(fit, test, type="prob")
+	# head(prediction.prob)
+	# head(test)
+}
+
+
+
+
+
 # Set working directory and import datafiles
 setwd("~/projects/r/titanic")
 train <- read.csv("data/train.csv")
@@ -21,8 +56,6 @@ test <- read.csv("data/test.csv")
 library(rpart)
 #install.packages('randomForest')
 library(randomForest)
-#install.packages('party')
-library(party)
 
 
 ## data clean-up
@@ -102,60 +135,29 @@ test <- train[-train.indices,]
 # Build Random Forest Ensemble
 set.seed(415)
 fit <- randomForest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize + FamilyID, data=train, importance=TRUE, ntree=50)
-# Our prediction
-prediction <- predict(fit, test)
-
-
-# fit <- randomForest(Survived ~ ., data=train, importance=TRUE, ntree=500)
 print(fit)
-
-
-## MODEL EVALUATION
 prediction <- predict(fit, test, type="response")
-# calculate the confusion matrix
-confusion <- table(prediction, test$Survived)
-print(confusion)
-
-print("-------------------------------")
-# accuracy
-accuracy <- sum(diag(confusion)) / sum(confusion)
-paste("Acccuracy" ,accuracy, sep = " : ")
-
-# precision
-precision <- confusion[2,2] / sum(confusion[2,])
-paste("Precision" ,precision, sep = " : ")
-
-# recall
-recall <- confusion[2,2] / sum(confusion[,2])
-paste("   Recall" ,recall, sep = " : ")
-
-# F1 score
-F1 <- 2 * precision * recall / (precision + recall)
-paste("       F1" ,F1, sep = " : ")
-print("-------------------------------")
-
-## We can also report probabilities
-# prediction.prob <- predict(fit, test, type="prob")
-# head(prediction.prob)
-# head(test)
-
-## show variable importance
+# show variable importance
 importance(fit)
+evaluate.model(prediction, test$Survived)
+
 # varImpPlot(fit)
-
-
 # # create a kaggle submission file
 # submit <- data.frame(PassengerId = test$PassengerId, Survived = prediction)
 # write.csv(submit, file = "firstforest.csv", row.names = FALSE)
 
 
 # #------------------------ a predictive model ------------------------
-# #
-# # Build condition inference tree Random Forest
-# set.seed(415)
-# fit <- cforest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize + FamilyID, data = train, controls=cforest_unbiased(ntree=2000, mtry=3))
-# # Our prediction
-# Prediction <- predict(fit, test, OOB=TRUE, type = "response")
-# # create a kaggle submission file
-# submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
-# write.csv(submit, file = "ciforest.csv", row.names = FALSE)
+#install.packages('party')
+library(party)
+# Build condition inference tree Random Forest
+set.seed(415)
+fit <- cforest(as.factor(Survived) ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize + FamilyID, data = train, controls=cforest_unbiased(ntree=500, mtry=3))
+# Our prediction
+prediction <- predict(fit, test, OOB=TRUE, type = "response")
+
+evaluate.model(prediction, test$Survived)
+
+# # # create a kaggle submission file
+# # submit <- data.frame(PassengerId = test$PassengerId, Survived = Prediction)
+# # write.csv(submit, file = "ciforest.csv", row.names = FALSE)
