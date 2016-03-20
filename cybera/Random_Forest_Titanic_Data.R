@@ -8,6 +8,41 @@
 ## Please install "randomForest" package: install.packages("randomForest")
 ###################################################################################
 
+
+
+evaluate.model <- function(predicted, actual) {
+	# calculate the confusion matrix
+	print("-------------------------------")
+	confusion <- table(predicted, actual)
+	print(confusion)
+
+	print("-------------------------------")
+	# accuracy
+	accuracy <- sum(diag(confusion)) / sum(confusion)
+	print(paste("Acccuracy" ,format(accuracy, digits=2), sep = " : "))
+
+	# precision
+	precision <- confusion[2,2] / sum(confusion[2,])
+	print(paste("Precision" ,format(precision, digits=2), sep = " : "))
+
+	# recall
+	recall <- confusion[2,2] / sum(confusion[,2])
+	print(paste("   Recall" ,format(recall, digits=2), sep = " : "))
+
+	# F1 score
+	F1 <- 2 * precision * recall / (precision + recall)
+	print(paste("       F1" ,format(F1, digits=2), sep = " : "))
+	print("-------------------------------")
+
+	## We can also report probabilities
+	# prediction.prob <- predict(fit, test, type="prob")
+	# head(prediction.prob)
+	# head(test)
+}
+
+
+
+
 ## load the library
 library(randomForest)
 
@@ -55,35 +90,8 @@ summary(titanic.test$Survived)
 titanic.rf.model <- randomForest(Survived ~ ., data=titanic.train, importance=TRUE, ntree=500)
 print(titanic.rf.model)
 
-## MODEL EVALUATION
-## Predict test set outcomes, reporting class labels
 titanic.rf.predictions <- predict(titanic.rf.model, titanic.test, type="response")
-## calculate the confusion matrix
-titanic.rf.confusion <- table(titanic.rf.predictions, titanic.test$Survived)
-print(titanic.rf.confusion)
-
-print("-------------------------------")
-## accuracy
-titanic.rf.accuracy <- sum(diag(titanic.rf.confusion)) / sum(titanic.rf.confusion)
-paste("Accuracy", titanic.rf.accuracy, sep = " : ")
-
-## precision
-titanic.rf.precision <- titanic.rf.confusion[2,2] / sum(titanic.rf.confusion[2,])
-paste("Precision", titanic.rf.precision, sep = " : ")
-
-## recall
-titanic.rf.recall <- titanic.rf.confusion[2,2] / sum(titanic.rf.confusion[,2])
-paste("   Recall", titanic.rf.recall, sep = " : ")
-
-## F1 score
-titanic.rf.F1 <- 2 * titanic.rf.precision * titanic.rf.recall / (titanic.rf.precision + titanic.rf.recall)
-paste("       F1", titanic.rf.F1, sep = " : ")
-print("-------------------------------")
-
-# We can also report probabilities
-# titanic.rf.predictions.prob <- predict(titanic.rf.model, titanic.test, type="prob")
-# head(titanic.rf.predictions.prob)
-# head(titanic.test)
+evaluate.model(titanic.rf.predictions, titanic.test$Survived)
 
 ## show variable importance
 importance(titanic.rf.model)

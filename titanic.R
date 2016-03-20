@@ -15,7 +15,6 @@
 evaluate.model <- function(predicted, actual) {
 	# calculate the confusion matrix
 	print("-------------------------------")
-	print(paste("a","b","c"))
 	confusion <- table(predicted, actual)
 	print(confusion)
 
